@@ -1,3 +1,6 @@
+
+# Contextual learning and early attentional orienting
+
 ## Installation
 
 Make a copy of this repo (e.g. with git clone).
@@ -6,7 +9,7 @@ We recommend creating a [conda](https://docs.conda.io/) environment to ensure co
 cd into the root folder of the repo, and run:
 
 ```
-conda create -f environment.yml
+conda env create -f environment.yml
 conda activate attcapeeg
 ```
 
