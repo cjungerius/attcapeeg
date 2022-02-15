@@ -1,116 +1,88 @@
-# -------------------------------------------------------------------------
-# Import libraries 
-# -------------------------------------------------------------------------
 from psychopy import core, visual, event
-from math import pi, atan2, degrees, cos, sin, pi, radians
-import random 
-import os 
+from math import pi, atan2, degrees, cos, sin
 
 
 # -------------------------------------------------------------------------
-# defining (stimulus) properties 
+# parameters
 # -------------------------------------------------------------------------
-# create a samller window for visualisation and tests 
+
 win_width = 1250
 win_height = 700
-win_size = [win_width, win_height] 
-height = 28; distance = 60; vertResolution = 1250 
 
-# this later is replaced by the canvas of participants screens
-mywin = visual.Window(win_size, monitor="testMonitor")
+screen_height_cm = 28
+screen_height_px = 1250
+screen_distance = 60
 
-# set the set size to 8 
-set_size = 8
+deg_per_px = degrees(atan2(.5*screen_height_cm, screen_distance)) / (.5*screen_height_px)
 
-# change paths so that media folder files can be called 
-path = os.path.realpath(__file__)
-dir = os.path.dirname(path)
-dir = dir.replace('scripts', 'media')
-os.chdir(dir)
+# -------------------------------------------------------------------------
+# window
+# -------------------------------------------------------------------------
 
-# inidate the stimuli with the respective colours 
-shape_colours = ['green', 'red']
+mywin = visual.Window([win_width, win_height], monitor="testMonitor")
 
-shapes_green = ['green_circle.png', 'green_diamond.png', 
-                'green_hexagon.png', 'green_square.png'] * 2
+# -------------------------------------------------------------------------
+# stimuli
+# -------------------------------------------------------------------------
 
-shapes_red = ['red_circle.png', 'red_diamond.png', 
-                'red_hexagon.png', 'red_square.png'] * 2
 
-# to randomize the pictures 
-random.shuffle(shapes_green)
-random.shuffle(shapes_red)
+stim_c   = visual.Circle(win=mywin,units = 'pix', radius=0.6/deg_per_px,lineWidth=6)
+stim_d   = visual.Circle(win=mywin,units = 'pix', radius=0.7/deg_per_px,edges=4,lineWidth=6,ori=90)
+stim_h   = visual.Circle(win=mywin,units = 'pix',radius=0.7/deg_per_px,edges=6,lineWidth=6)
+stim_s   = visual.Circle(win=mywin,units = 'pix',radius=0.7/deg_per_px,edges=4,lineWidth=6,ori=45)
 
-# Calculate the number of degrees that correspond to a single pixel
-deg_per_px = degrees(atan2(.5*height, distance)) / (.5*vertResolution) 
+shapes = {'c': stim_c, 'd': stim_d, 'h': stim_h, 's': stim_s}
 
-# set values for the fixation cross 
-fixSize = int(0.2/deg_per_px); LineWidth = int(0.05/deg_per_px)
-deg_per_px = degrees(atan2(.5*height, distance)) / (.5*vertResolution) 
+# set values for the fixation cross
+fixSize = int(0.2/deg_per_px); LineWidth = int(0.05/deg_per_px)*3
 
 fixCross = visual.ShapeStim(
-win = mywin, 
+win = mywin,
 vertices = ((0,-fixSize), (0,fixSize), (0,0), (-fixSize,0), (fixSize,0)),
-lineWidth = LineWidth*3,
+lineWidth = LineWidth,
 closeShape = False,
 units = 'pix')
- 
+
 
 # -------------------------------------------------------------------------
-# important functions 
+# functions
 # -------------------------------------------------------------------------
-def calculateCirclePosns(center_x, center_y, set_size = 8, r = 90): 
-    
-    circle_posns = [] # creates the list circle positons will be stored in
+def calculateCirclePosns(set_size = 8, r = 90):
+
+    circle_posns = []
     anglesegment = 2*pi/set_size # calculates the space equally between circle positions depending on the set size
-    
-    for i in range(set_size):
-        curr_x = r * sin(i*anglesegment) + center_x # calculates current x; it is sin as the picture looked like the one rectangle posn is vertaical and not horizintal
-        curr_y = r * cos(i*anglesegment) + center_y
-        circle_posns.append((curr_x, curr_y)) # append circle posns with the current touple of current x and y
-    
-    return circle_posns # returns the now filled list of circle positions 
 
-def drawFixationDisplay(my_win): 
+    for i in range(set_size):
+        x = r * sin(i*anglesegment)    # calculates current x; it is sin as the picture looked like the one rectangle posn is vertaical and not horizintal
+        y = r * cos(i*anglesegment)
+        circle_posns.append((x, y)) # append circle posns with the current touple of current x and y
+
+    return circle_posns # returns the now filled list of circle positions
+
+def drawFixationDisplay(my_win):
     # Calculate the number of degrees that correspond to a single pixel
     fixCross.draw()
     my_win.flip()
     core.wait(0.500)
 
-def drawSearchDisplay(my_win): 
+def drawSearchDisplay(my_win):
     fixCross.draw() # first draw a fixation cross once more
-    
-    # then loop through stimuli (here green but with a simple if-else you could 
-    # descide if red or green shown)
-    # NOTE: needs to change when clear what target and what distractor will be 
-    # also then need to make sure that target and distractor only occur on orthogonals 
-    # calculate the circle posns around the center of the screen 
-    circle_posns = calculateCirclePosns(0,0)
 
-    for i in range(set_size): 
-        my_pic = shapes_red[i-1] # or shapes_green[i-1]
-        img = visual.ImageStim(
-            win=my_win,
-            image=my_pic,
-            units="pix",
-            pos=circle_posns[i-1]
-        )
-        # scale the images to be smaller
-        size_x = img.size[0]
-        size_y = img.size[1]
-
-        img.size = [size_x * 0.5, size_y * 0.5]
-    
-        img.draw()
+    # NOTE: needs to change when clear what target and what distractor will be
+    # also then need to make sure that target and distractor only occur on orthogonals
+    # calculate the circle posns around the center of the screen
+    circle_posns = calculateCirclePosns()
+    stimuli = [shapes['c']]*8
+    for i, stim in enumerate(stimuli):
+        stim.setLineColor((1,-1,-1)) # set stimuli to red: can change to green (-1,1,-1)
+        stim.pos = circle_posns[i]
+        stim.draw()
 
     my_win.flip()
     event.waitKeys(keyList = 'space')
 
 
-# now add an if __name__ == "__main__" function to ensure that the two 
-# displays are only drawn autonatically if this main file is run and not 
-# when it is imported 
-if __name__ == "__main__": 
-    # exucute the functions 
+if __name__ == "__main__":
+    # exucute the functions
     drawFixationDisplay(mywin)
     drawSearchDisplay(mywin)
