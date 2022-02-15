@@ -1,23 +1,11 @@
-#!/usr/bin/env python
-# -*- coding: utf-8 -*-
-
-import random, os
-from psychopy import core, data, visual
-from math import atan2, degrees
-import display_functions
+from psychopy import core, data
+from display_functions import *
 
 def run():
 
-	# Create a window
-
-	win = visual.Window([400,300], monitor="testMonitor")
-
-
-
-
 	# Create factorial design
 	factors = {
-		'targets': [0, 2, 4, 6],
+		'targetloc': [0, 2, 4, 6],
 		'distractor': [True, False],
 		'trialType': ['search', 'search', 'probe'],
 		'lineDir': ['l','r']
@@ -30,9 +18,11 @@ def run():
 	# Run the experiment
 	for trial in trials:
 		print(trial)
+		drawFixationDisplay(mywin)
+		drawSearchDisplay(mywin)
 
 	# Close the window
-	win.close()
+	mywin.close()
 	
 	# Close PsychoPy
 	core.quit()
