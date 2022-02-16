@@ -1,5 +1,6 @@
 from psychopy import core, data
 from display_functions import *
+from probe_letter_recall import *
 
 def run():
 
@@ -20,6 +21,9 @@ def run():
 		print(trial)
 		drawFixationDisplay(mywin)
 		drawSearchDisplay(mywin)
+		if trial['trialType'] == 'probe':
+			drawLetters(mywin)
+			letterListener(mywin)
 
 	# Close the window
 	mywin.close()
