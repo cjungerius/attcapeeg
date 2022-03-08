@@ -37,12 +37,12 @@ shapes = {'c': stim_c, 'd': stim_d, 'h': stim_h, 's': stim_s}
 fixSize = int(0.2/deg_per_px); LineWidth = int(0.05/deg_per_px)*3
 
 fixCross = visual.ShapeStim(
-win = mywin, 
+win = mywin,
 vertices = ((0,-fixSize), (0,fixSize), (0,0), (-fixSize,0), (fixSize,0)),
 lineWidth = LineWidth,
 closeShape = False,
 units = 'pix')
- 
+
 
 # -------------------------------------------------------------------------
 # functions 
@@ -50,8 +50,8 @@ units = 'pix')
 def calculateCirclePosns(set_size = 8, r = 90): 
     
     circle_posns = [] 
-    anglesegment = 2*pi/set_size # calculates the space equally between circle positions depending on the set size
-    
+   anglesegment = 2*pi/set_size # calculates the space equally between circle positions depending on the set size
+
     for i in range(set_size):
         x = r * sin(i*anglesegment)    # calculates current x; it is sin as the picture looked like the one rectangle posn is vertaical and not horizintal
         y = r * cos(i*anglesegment)
@@ -59,7 +59,7 @@ def calculateCirclePosns(set_size = 8, r = 90):
     
     return circle_posns # returns the now filled list of circle positions 
 
-def drawFixationDisplay(my_win): 
+def drawFixationDisplay(my_win):
     # Calculate the number of degrees that correspond to a single pixel
     fixCross.draw()
     my_win.flip()
@@ -80,12 +80,12 @@ def drawSearchDisplay(my_win, shape_arr, color_arr):
         else:
             stim.setLineColor((-1,1,-1)) # green
         stim.pos = circle_posns[i]    
-        stim.draw()
+       stim.draw()
 
     my_win.flip()
 
 
 if __name__ == "__main__": 
     # exucute the functions 
-    drawFixationDisplay(mywin)
+   drawFixationDisplay(mywin)
     drawSearchDisplay(mywin)

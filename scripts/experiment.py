@@ -7,7 +7,7 @@ def run():
 
 	info = get_subject_info(1234)
 
-	# Create factorial design
+# Create factorial design
 	factors = {
 		'targetloc': [0, 2, 4, 6],
 		'distractor': [True, False],
@@ -22,7 +22,6 @@ def run():
 	# Run the experiment
 	for trial in trials:
 		search_trial(trial, info)
-
 	# Close the window
 	mywin.close()
 	
@@ -30,6 +29,4 @@ def run():
 	core.quit()
 
 if __name__ == '__main__':
-
-	
 	run()
