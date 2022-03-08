@@ -65,21 +65,24 @@ def drawFixationDisplay(my_win):
     my_win.flip()
     core.wait(0.500)
 
-def drawSearchDisplay(my_win): 
+def drawSearchDisplay(my_win, shape_arr, color_arr): 
     fixCross.draw() # first draw a fixation cross once more
     
     # NOTE: needs to change when clear what target and what distractor will be 
     # also then need to make sure that target and distractor only occur on orthogonals 
     # calculate the circle posns around the center of the screen 
     circle_posns = calculateCirclePosns()
-    stimuli = [shapes['c']]*8
-    for i, stim in enumerate(stimuli): 
-        stim.setLineColor((1,-1,-1)) # set stimuli to red: can change to green (-1,1,-1)
+    stimuli = [shapes[shape] for shape in shape_arr]
+
+    for i, stim in enumerate(stimuli):
+        if color_arr[i] == 'r':
+            stim.setLineColor((1,-1,-1)) #red
+        else:
+            stim.setLineColor((-1,1,-1)) # green
         stim.pos = circle_posns[i]    
         stim.draw()
 
     my_win.flip()
-    event.waitKeys(keyList = 'space')
 
 
 if __name__ == "__main__": 

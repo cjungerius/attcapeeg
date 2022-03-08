@@ -1,14 +1,15 @@
 from psychopy import core, data
 from trial_functions import *
-
+from util_functions import *
 
 
 def run():
 
+	info = get_subject_info(1234)
+
 	# Create factorial design
 	factors = {
 		'targetloc': [0, 2, 4, 6],
-		'distractorloc': [0, 2, 4, 6],
 		'distractor': [True, False],
 		'trialType': ['search', 'search', 'probe'],
 		'lineDir': ['l','r']
@@ -20,8 +21,7 @@ def run():
 
 	# Run the experiment
 	for trial in trials:
-		print(trial)
-		search_trial(trial)
+		search_trial(trial, info)
 
 	# Close the window
 	mywin.close()
