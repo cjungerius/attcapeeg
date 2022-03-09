@@ -21,7 +21,9 @@ def run():
 
 	# Run the experiment
 	for trial in trials:
-		search_trial(trial, info)
+		print(trial)
+		g = general_trial(trial, info)
+		print(g)
 	# Close the window
 	mywin.close()
 
@@ -30,3 +32,4 @@ def run():
 
 if __name__ == '__main__':
 	run()
+
