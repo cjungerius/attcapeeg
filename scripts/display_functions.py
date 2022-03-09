@@ -1,5 +1,6 @@
 from psychopy import core, visual, event
 from math import pi, atan2, degrees, cos, sin
+import random
 
 
 # -------------------------------------------------------------------------
@@ -14,6 +15,7 @@ screen_height_px = 1250
 screen_distance = 60
 
 deg_per_px = degrees(atan2(.5*screen_height_cm, screen_distance)) / (.5*screen_height_px)
+px2deg = 36 # to later avoid magic numbers 
 
 # -------------------------------------------------------------------------
 # window
@@ -65,12 +67,9 @@ def drawFixationDisplay(my_win):
     my_win.flip()
     core.wait(0.500)
 
-def drawSearchDisplay(my_win, shape_arr, color_arr):
+def drawDisplay(my_win, shape_arr, color_arr, display_type, to_draw):
     fixCross.draw() # first draw a fixation cross once more
-
-    # NOTE: needs to change when clear what target and what distractor will be
-    # also then need to make sure that target and distractor only occur on orthogonals
-    # calculate the circle posns around the center of the screen
+    
     circle_posns = calculateCirclePosns()
     stimuli = [shapes[shape] for shape in shape_arr]
 
@@ -80,12 +79,44 @@ def drawSearchDisplay(my_win, shape_arr, color_arr):
         else:
             stim.setLineColor((-1,1,-1)) # green
         stim.pos = circle_posns[i]
-       stim.draw()
+        stim.draw()
+
+        if display_type == 'search': 
+            line = visual.Line(win=my_win,units="pix",lineColor=[-1, -1, -1])
+            
+            if to_draw[i] == 'l': 
+                line.start = [circle_posns[i][0]-0.3*px2deg, circle_posns[i][1]]
+                line.end = [circle_posns[i][0]-0.6*px2deg, circle_posns[i][1]]
+            
+            else: 
+                line.start = [circle_posns[i][0]+0.3*px2deg, circle_posns[i][1]]
+                line.end = [circle_posns[i][0]+0.6*px2deg, circle_posns[i][1]]
+                        
+            line.lineWidth = 3
+            line.draw()
+
+        elif display_type == 'probe letter': 
+            text = visual.TextStim(win=my_win, units='pix', text=to_draw[i], pos=circle_posns[i])
+            text.draw()
+
+        else: 
+            text = visual.TextStim(win=my_win, units='pix', text='#', pos=circle_posns[i])
+            text.draw()
 
     my_win.flip()
-
-
+    
 if __name__ == "__main__":
-    # exucute the functions
-   drawFixationDisplay(mywin)
-    drawSearchDisplay(mywin)
+    shape_arr = ['c', 's', 's', 's', 'd', 'h', 'h', 'h']
+    color_arr = ['r', 'r', 'r', 'r', 'g', 'r', 'r','r']
+    line_arr = ['l', 'r', 'l', 'r', 'r', 'l', 'l', 'r']
+    letter_arr = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S', 'T', 'U', 'V', 'W', 'X', 'Y', 'Z']
+    random.shuffle(letter_arr)
+
+    # exucute the functions press space to continue
+    drawFixationDisplay(mywin)
+    event.waitKeys(keyList=['space'])
+    # also testable: 
+    # drawDisplay(mywin, shape_arr, color_arr, 'probe letter', letters_arr)
+    # drawDisplay(mywin, shape_arr, color_arr, 'probe mask', [])
+    drawDisplay(mywin, shape_arr, color_arr, 'search', line_arr)
+    event.waitKeys(keyList=['space'])
