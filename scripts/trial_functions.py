@@ -3,6 +3,7 @@ from display_functions import *
 from util_functions import *
 from probe_letter_recall import *
 from psychopy import core, event
+import itertools
 
 
 
@@ -12,17 +13,48 @@ def general_trial(trial, info):
         lineDir = trial['lineDir']
         
         trialType = trial['trialType']
+        novel = trial['novel']
 
-        contexts = info['contexts']
         target_shape = info['target_shape']
         target_color = info['target_color']
-        
+
+        learned_contexts = info['contexts']
+        print(learned_contexts)
+        # this should still work I think for the distractor to be random 
         contextnumber = random.choice([0,1,2])
         distractorlocs = list(filter(lambda x: x!= targetloc, [0, 2, 4, 6]))
         distractorloc = distractorlocs[contextnumber]
 
-        shape_arr = copy.deepcopy(contexts[targetloc//2][contextnumber])
-        shape_arr.insert(targetloc,target_shape)
+        if novel == False: # means that contexts are learned 
+            shape_arr = copy.deepcopy(learned_contexts[targetloc//2][contextnumber])
+            shape_arr.insert(targetloc,target_shape)
+            #print(shape_arr)
+
+        elif novel == True: 
+            
+            learned_contexts_f = list(itertools.chain(*learned_contexts))
+            
+            while True: 
+                shape_arr = ['', '', '', '', '', '', '', '']
+                shape_arr[targetloc] = target_shape
+            
+                if target_shape == 'c': 
+                    other_shapes = ['s', 's', 's', 'h', 'h', 'h', 'd']
+                else: 
+                    other_shapes = ['s', 's', 's', 'h', 'h', 'h', 'c']
+                random.shuffle(other_shapes) 
+                
+                if other_shapes not in learned_contexts_f: 
+                    print(other_shapes)
+                    other_shapes.reverse() # need to so that later pop in same 
+                    # order 
+                    for i in range(8):
+                        if i != targetloc:
+                            shape_arr[i] = other_shapes.pop()
+                    
+                    print(shape_arr)
+                    break
+
 
         color_arr = [target_color] * 8
         if distractor:
@@ -105,7 +137,8 @@ if __name__ == '__main__':
                 'targetloc': 4,
                 'distractor': True,
                 'trialType': 'search',
-                'lineDir': 'l'
+                'lineDir': 'l',
+                'novel': True 
         }
 
         r = general_trial(trial, info)
