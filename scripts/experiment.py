@@ -12,7 +12,8 @@ def run():
 		'targetloc': [0, 2, 4, 6],
 		'distractor': [True, False],
 		'trialType': ['search', 'search', 'probe'],
-		'lineDir': ['l','r']
+		'lineDir': ['l','r'], 
+		'novel': [True, False]
 	}
 
 	trialList = data.createFactorialTrialList(factors)
