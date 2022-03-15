@@ -25,37 +25,27 @@ def general_trial(trial, info):
         distractorlocs = list(filter(lambda x: x!= targetloc, [0, 2, 4, 6]))
         distractorloc = distractorlocs[contextnumber]
 
-        if novel == False: # means that contexts are learned 
+        if not novel: # means that contexts are learned 
             shape_arr = copy.deepcopy(learned_contexts[targetloc//2][contextnumber])
-            shape_arr.insert(targetloc,target_shape)
-            #print(shape_arr)
 
-        elif novel == True: 
+
+        elif novel: 
             
             learned_contexts_f = list(itertools.chain(*learned_contexts))
+            print('im a novelty')
             
             while True: 
-                shape_arr = ['', '', '', '', '', '', '', '']
-                shape_arr[targetloc] = target_shape
             
                 if target_shape == 'c': 
-                    other_shapes = ['s', 's', 's', 'h', 'h', 'h', 'd']
+                    shape_arr = ['s', 's', 's', 'h', 'h', 'h', 'd']
                 else: 
-                    other_shapes = ['s', 's', 's', 'h', 'h', 'h', 'c']
-                random.shuffle(other_shapes) 
+                    shape_arr = ['s', 's', 's', 'h', 'h', 'h', 'c']
+                random.shuffle(shape_arr) 
                 
-                if other_shapes not in learned_contexts_f: 
-                    print(other_shapes)
-                    other_shapes.reverse() # need to so that later pop in same 
-                    # order 
-                    for i in range(8):
-                        if i != targetloc:
-                            shape_arr[i] = other_shapes.pop()
-                    
-                    print(shape_arr)
+                if shape_arr not in learned_contexts_f:                
                     break
 
-
+        shape_arr.insert(targetloc,target_shape)
         color_arr = [target_color] * 8
         if distractor:
                 color_arr[distractorloc] = next(filter(lambda c: c!=target_color,['r','g']))
