@@ -1,0 +1,428 @@
+# -------------------------------------------------------------------------
+# Import libraries
+# -------------------------------------------------------------------------
+from psychopy import visual, event
+import random, os
+import numpy as np
+from string import ascii_uppercase
+from psychopy.event import Mouse
+from display_functions import *
+
+# if images used than this 
+path = os.path.realpath(__file__)
+dir = os.path.dirname(path)
+dir = dir.replace('scripts', 'media')
+os.chdir(dir)
+
+# -------------------------------------------------------------------------
+# making the instruction screens as different functions
+# -------------------------------------------------------------------------
+# define helpful functions 
+# needed to do CriclePosns etc. again but with a smaller frame and a different 
+# (we want to scale everything to be half its size)
+# position was otherwise not possible as we directly draw onto our mywin
+
+def calculateCirclePosnsSmall(set_size = 8, r = 45, cx = 0, cy = 0):
+
+    circle_posns = []
+    anglesegment = 2*pi/set_size # calculates the space equally between circle positions depending on the set size
+
+    for i in range(set_size):
+        x = r * sin(i*anglesegment) + cx   # calculates current x; it is sin as the picture looked like the one rectangle posn is vertaical and not horizintal
+        y = r * cos(i*anglesegment) + cy
+        circle_posns.append((x, y)) # append circle posns with the current touple of current x and y
+
+    return circle_posns
+
+def FixCrossSmall(mywin): 
+    h_rect = mywin.size[1]/13
+    fixCross = visual.ShapeStim(
+                win = mywin,
+                vertices = ((0,-fixSize/2+h_rect), (0,fixSize/2+h_rect), (0,h_rect), (-fixSize/2,h_rect), (fixSize/2,h_rect)),
+                lineWidth = LineWidth,
+                closeShape = False,
+                units = 'pix')
+    fixCross.draw()
+
+def drawSearchDisplaySmall(mywin, target_colour, target_shape): 
+    circle_posns_small = calculateCirclePosnsSmall(cy = mywin.size[1]/13)
+    stim_c   = visual.Circle(win=mywin,units = 'pix', radius=0.6/deg_per_px/2,lineWidth=6)
+    stim_d   = visual.Circle(win=mywin,units = 'pix', radius=0.7/deg_per_px/2,edges=4,lineWidth=6,ori=90)
+    stim_h   = visual.Circle(win=mywin,units = 'pix',radius=0.7/deg_per_px/2,edges=6,lineWidth=6)
+    stim_s   = visual.Circle(win=mywin,units = 'pix',radius=0.7/deg_per_px/2,edges=4,lineWidth=6,ori=45)
+
+    shapes = {'c': stim_c, 'd': stim_d, 'h': stim_h, 's': stim_s}
+    stimuli = [shapes['h']] * 4 + [shapes['s']] * 4
+    
+    for i, stim in enumerate(stimuli):
+        if i == 4: # make sure arrow later points at target hence need to place arrow on bottom center posn
+            if target_shape == 'c': 
+                stim = shapes['c']
+            elif target_shape == 'd':
+                stim = shapes['d']
+        if target_colour == 'r': 
+            stim.setLineColor((1,-1,-1)) # set stimuli to red: can change to green (-1,1,-1)
+        elif target_colour == 'g': 
+            stim.setLineColor((-1,1,-1))
+            
+        if i == 2: # now draw distractor other colour and other form; draw it on a vertical meridian
+            # for instrictions ok for real display needs to be changable 
+            if target_shape == 'c': 
+                stim = shapes['d']
+                if target_colour == 'r': 
+                    stim.setLineColor((-1,1,-1)) # set stimuli to red: can change to green (-1,1,-1)
+                elif target_colour == 'g': 
+                    stim.setLineColor((1,-1,-1))
+            elif target_shape == 'd':
+                stim = shapes['c']
+                if target_colour == 'r': 
+                    stim.setLineColor((-1,1,-1)) # set stimuli to red: can change to green (-1,1,-1)
+                elif target_colour == 'g': 
+                    stim.setLineColor((1,-1,-1))
+        
+        stim.pos = circle_posns_small[i]
+        stim.draw()
+    
+def drawBoxesWelcome(): 
+    polygon_next = visual.Rect(mywin, width = 0.14, height = 0.1, pos = (.1,-.2), ori=0,
+    lineWidth=3, lineColor=[0.6549, 0.6549, 0.6549], lineColorSpace='rgb',
+    fillColor=[1,1,1], fillColorSpace='rgb',
+    opacity=1, interpolate=True)
+    
+    polygon_prev = visual.Rect(mywin, width = 0.18, height = 0.1, pos = (-.1,-.2), ori=0,
+    lineWidth=3, lineColor=[0.6549, 0.6549, 0.6549], lineColorSpace='rgb',
+    fillColor=[1,1,1], fillColorSpace='rgb',
+    opacity=1, interpolate=True)
+    
+    next_text = visual.TextStim(mywin,
+    text='Next >',
+    font='Arial',
+    pos=(.1,-.2), height=0.06, wrapWidth=None, ori=0,
+    color='black', colorSpace='rgb', opacity=1)
+    
+    prev_text = visual.TextStim(mywin,
+    text='< Previous',
+    font='Arial',
+    pos=(-.1,-.2), height=0.06, wrapWidth=None, ori=0,
+    color='black', colorSpace='rgb', opacity=1)
+    
+    return polygon_next, polygon_prev, next_text, prev_text
+    
+def drawBoxesScreens(): 
+    polygon_next = visual.Rect(mywin, width = 0.14, height = 0.1, pos = (.1,-.6), ori=0,
+    lineWidth=3, lineColor=[0.6549, 0.6549, 0.6549], lineColorSpace='rgb',
+    fillColor=[1,1,1], fillColorSpace='rgb',
+    opacity=1, interpolate=True)
+    
+    polygon_prev = visual.Rect(mywin, width = 0.18, height = 0.1, pos = (-.1,-.6), ori=0,
+    lineWidth=3, lineColor=[0.6549, 0.6549, 0.6549], lineColorSpace='rgb',
+    fillColor=[1,1,1], fillColorSpace='rgb',
+    opacity=1, interpolate=True)
+    
+    next_text = visual.TextStim(mywin,
+    text='Next >',
+    font='Arial',
+    pos=(.1,-.6), height=0.06, wrapWidth=None, ori=0,
+    color='black', colorSpace='rgb', opacity=1)
+    
+    prev_text = visual.TextStim(mywin,
+    text='< Previous',
+    font='Arial',
+    pos=(-.1,-.6), height=0.06, wrapWidth=None, ori=0,
+    color='black', colorSpace='rgb', opacity=1)
+    
+    return polygon_next, polygon_prev, next_text, prev_text
+
+    
+# Instructions with using Pictures 
+def instrcutionScreensPictures(mywin, target_shape = 'c', target_colour = 'r'): 
+    i = 0 # initate start val
+    mouse = event.Mouse(win=mywin)
+
+    while i < 7: 
+        Pressed = False
+        pn, pp, nt, pt = drawBoxesWelcome()
+        inst_text = visual.TextStim(mywin, 'Welcome to the experiment! We will instruct you to the task you will preform'
+                                        , units = "pix")
+
+        if i == 1 or i == 2 or i == 3: 
+            if i == 1: 
+                inst_text = visual.TextStim(mywin, 'In each trial, a brief fixation will appear - please center your gaze on the fiaxtion cross when it appears.', units="pix")
+                img = visual.ImageStim(mywin, image='inst_fix.png', units="pix")
+                img.size = img.size*0.3
+            if i == 2: 
+                inst_text = visual.TextStim(mywin, 'Next, a number of coloured stimuli will appear.', units="pix")
+                img = visual.ImageStim(mywin, image='inst_search_'+ target_colour +'.png', units="pix")
+                img.size = img.size*0.3
+            if i == 3: 
+                inst_text = visual.TextStim(mywin, text = 'Your task is to search for the               , then react to the line segment inside it. If the line segment points to the left, press the left arrow key; if the line segment points to the right, press the right arrow key.', units="pix")
+                img = visual.ImageStim(mywin, image='inst_search_'+ target_colour + target_shape +'.png', units="pix")
+                img.size = img.size*0.4
+                
+                # if we want to make this work I need to know the exact screen size of our expi otherwise cannot make it bold 
+                if target_shape == 'd':
+                    g_text = visual.TextStim(mywin, text = 'diamond', units = "pix", bold = True)
+                
+                if target_shape == 'c':
+                    g_text = visual.TextStim(mywin, text = 'circle', units = "pix", bold = True)
+                    
+                g_text.pos = (0+mywin.size[0]/37,-mywin.size[1]/13)
+                g_text.color = 'black'
+                g_text.height = 20
+                
+            inst_text.pos = (0,-mywin.size[1]/10)
+    
+            pn, pp, nt, pt = drawBoxesScreens()
+            
+            img.pos = (0, mywin.size[1]/13)
+    
+            rect_outline = visual.Rect(mywin,
+            lineWidth=30,
+            units = 'pix',
+            colorSpace='rgb',
+            lineColor=[-1, -1, -1],
+            size= img.size,
+            pos = img.pos,
+            fillColor=None,
+            opacity=None,
+            interpolate=False
+            )
+            
+            img.draw()
+            rect_outline.draw()
+            
+        elif i == 4:
+            inst_text = visual.TextStim(mywin, 'Please try to be as fast and accurate as possible throughout the experiment!', units = "pix")
+            n, pp, nt, pt = drawBoxesWelcome()
+        elif i == 5: 
+            inst_text = visual.TextStim(mywin, 'We will now begin with a brief practice run so you can get acquainted with the task. Press Next to start the practice run!', units = "pix")
+            pn, pp, nt, pt = drawBoxesWelcome()
+
+        inst_text.color = 'black'
+        inst_text.height = 20
+        inst_text.draw()
+        if i == 3: # needs to be here bc first the text with the space needs to be drawn where then the bold text of the starget shape can be drawn onto
+            g_text.draw()
+        pn.draw()
+        pp.draw()
+        nt.draw()
+        pt.draw()
+        mywin.flip()
+        
+        while not Pressed:
+            if mouse.isPressedIn(pn):
+                i = i + 1
+                Pressed = True
+            if mouse.isPressedIn(pp) and i != 0: # make sure that in welcome no previous possible 
+                i = i - 1
+                Pressed = True
+
+# Instructions by drawing the Stimuli ourselves  
+def instrcutionScreensSelfDraw(mywin, target_shape = 'c', target_colour = 'r'): 
+    i = 0 # initate start val
+    mouse = event.Mouse(win=mywin)
+
+    while i < 6: 
+        pn, pp, nt, pt = drawBoxesWelcome()
+        inst_text = visual.TextStim(mywin, 'Welcome to the experiment! We will instruct you to the task you will preform', units = "pix")
+
+        if i == 1 or i == 2 or i == 3: 
+            h_rect = mywin.size[1]/13
+            FixCrossSmall(mywin)
+            if i == 1: 
+                inst_text = visual.TextStim(mywin, 'In each trial, a brief fixation will appear - please center your gaze on the fiaxtion cross when it appears.', units="pix")
+            if i == 2: 
+                inst_text = visual.TextStim(mywin, 'Next, a number of coloured stimuli will appear.', units="pix")
+                drawSearchDisplaySmall(mywin, target_colour, target_shape)
+            if i == 3: 
+                inst_text = visual.TextStim(mywin, text = 'Your task is to search for the               , then react to the line segment inside it. If the line segment points to the left, press the left arrow key; if the line segment points to the right, press the right arrow key.', units="pix")
+                drawSearchDisplaySmall(mywin, target_colour, target_shape)
+                # if we want to make this work I need to know the exact screen size of our expi otherwise cannot make it bold 
+                if target_shape == 'd':
+                    g_text = visual.TextStim(mywin, text = 'diamond', units = "pix", bold = True)
+                
+                if target_shape == 'c':
+                    g_text = visual.TextStim(mywin, text = 'circle', units = "pix", bold = True)
+                    
+                g_text.pos = (0+mywin.size[0]/37,-mywin.size[1]/13)
+                g_text.color = 'black'
+                g_text.height = 20
+                
+                rect_arrow = visual.Rect(mywin,
+                colorSpace='rgb',
+                lineColor=[-0.451, 0.0196, 0.4118],
+                size= (0.02, 0.08),
+                pos = (0,-0.018),
+                fillColor=[-0.451, 0.0196, 0.4118],
+                #ori = 180,
+                opacity=None,
+                interpolate=False
+                )
+                tri_arrow = visual.Polygon(mywin, 
+                edges = 3, 
+                colorSpace='rgb',
+                lineColor=[-0.451, 0.0196, 0.4118],
+                size= (.06, .07),
+                pos = (0,0.018),
+                fillColor=[-0.451, 0.0196, 0.4118],
+                opacity=None,
+                interpolate=False
+                )
+
+            inst_text.pos = (0,-mywin.size[1]/10)
+    
+            pn, pp, nt, pt = drawBoxesScreens()
+
+            rect_outline = visual.Rect(mywin,
+            lineWidth=30,
+            units = 'pix',
+            colorSpace='rgb',
+            lineColor=[-1, -1, -1],
+            size= mywin.size/4,
+            pos = (0,h_rect),
+            fillColor=None,
+            opacity=None,
+            interpolate=False
+            )
+            rect_outline.draw()
+            
+        elif i == 4:
+            inst_text = visual.TextStim(mywin, 'Please try to be as fast and accurate as possible throughout the experiment!', units = "pix")
+            n, pp, nt, pt = drawBoxesWelcome()
+        elif i == 5: 
+            inst_text = visual.TextStim(mywin, 'We will now begin with a brief practice run so you can get acquainted with the task. Press Next to start the practice run!', units = "pix")
+            pn, pp, nt, pt = drawBoxesWelcome()
+
+        inst_text.color = 'black'
+        inst_text.height = 20
+        inst_text.draw()
+
+        if i == 3: # needs to be here bc first the text with the space needs to be drawn where then the bold text of the starget shape can be drawn onto
+            g_text.draw()
+            rect_arrow.draw()
+            tri_arrow.draw()
+
+        pn.draw()
+        pp.draw()
+        nt.draw()
+        pt.draw()
+        mywin.flip()
+        
+        Pressed = False
+        while not Pressed:
+            if mouse.isPressedIn(pn):
+                i = i + 1
+                Pressed = True
+            elif mouse.isPressedIn(pp) and i != 0: # make sure that in welcome no previous possible 
+                i = i - 1
+                Pressed = True
+
+# The second Instruction Screens by using a mixed appraoch of drawing stimuli and
+# using Pictures 
+def instrcution_2ScreensSelfDraw(mywin, target_shape = 'c', target_colour = 'r'): 
+    i = 0 # initate start val
+    mouse = event.Mouse(win=mywin)
+    cont = True 
+    
+    while i < 7: 
+        pn, pp, nt, pt = drawBoxesWelcome()
+        inst_text = visual.TextStim(mywin, 'You have just practiced the search task, which will make up the majority of the experiment. However, we will now introduce a second task for you to perform in some trials.', units = "pix")
+
+        if i in [1,2,3,4]: 
+            h_rect = mywin.size[1]/13
+            if i == 1: 
+                FixCrossSmall(mywin)
+                inst_text = visual.TextStim(mywin, 'In some attempts, you do not need to make a search response. You will (very briefly!) see different letters appearing in these shapes, and you need to remember them in a short time.', units="pix") 
+                drawSearchDisplaySmall(mywin, target_colour, target_shape)
+                # then draw the letters into the circles 
+                
+            if i == 2: 
+                FixCrossSmall(mywin)
+                inst_text = visual.TextStim(mywin, 'These shapes will be replaced by masking # symbols after only 100 ms. Note that it might be very hard to perceive the letters! This is by design, please do not let this discourage you.', units="pix")
+                drawSearchDisplaySmall(mywin, target_colour, target_shape)
+                # then draw mask display
+                
+            if i == 3: 
+                # here I used the pictures but that can be later changed 
+                inst_text = visual.TextStim(mywin, text = 'After that, you will immediately see the screen as shown above. You need to press the corresponding key on the keyboard to select the corresponding letter. Try to remember as many as possible.', units="pix")
+                img = visual.ImageStim(mywin, image='inst_text_0.png', units="pix")
+                img.size = img.size*0.3
+                img.pos = (0, h_rect)
+                img.draw()
+            if i == 4: 
+                # here I used the pictures but that can be later changed 
+                inst_text = visual.TextStim(mywin, text = 'When you press a letter key, the corresponding letter will turn red (see above). When you have entered all you remember, press the space bar to continue.', units="pix")
+                img = visual.ImageStim(mywin, image='inst_text_' + target_colour + '.png', units="pix")
+                img.size = img.size*0.3
+                img.pos = (0, h_rect)
+                img.draw()
+            
+            inst_text.pos = (0,-mywin.size[1]/10)
+            
+            pn, pp, nt, pt = drawBoxesScreens()
+
+            rect_outline = visual.Rect(mywin,
+            lineWidth=30,
+            units = 'pix',
+            colorSpace='rgb',
+            lineColor=[-1, -1, -1],
+            size= mywin.size/4,
+            pos = (0,h_rect),
+            fillColor=None,
+            opacity=None,
+            interpolate=False
+            )
+            rect_outline.draw()
+            
+        elif i == 5:
+            inst_text = visual.TextStim(mywin, 'You might find this letter task very difficult, or believe you did not perceive any letters clearly - please try to report some letters regardless.', units = "pix")
+            n, pp, nt, pt = drawBoxesWelcome()
+        elif i == 6: 
+            inst_text = visual.TextStim(mywin, 'We will now have one more practice block where you will see both tasks. Press Next to start the practice block!', units = "pix")
+            pn, pp, nt, pt = drawBoxesWelcome()
+
+        inst_text.color = 'black'
+        inst_text.height = 20
+        inst_text.draw()
+
+        pn.draw()
+        pp.draw()
+        nt.draw()
+        pt.draw()
+        mywin.flip()
+        
+        Pressed = False
+        while not Pressed:
+            if mouse.isPressedIn(pn):
+                i = i + 1
+                Pressed = True
+            if mouse.isPressedIn(pp) and i != 0: # make sure that in welcome no previous possible 
+                i = i - 1
+                Pressed = True
+
+if __name__ == "__main__":
+    # -------------------------------------------------------------------------
+    # defining (stimulus) properties
+    # -------------------------------------------------------------------------
+    # create a samller window for visualisation and tests
+    win_width = 1250
+    win_height = 700
+    win_size = [win_width, win_height]
+    height = 28
+    distance = 60
+    vertResolution = 1250
+    
+    screen_height_cm = 28
+    screen_height_px = 1250
+    screen_distance = 60
+
+    deg_per_px = degrees(atan2(.5*screen_height_cm, screen_distance)) / (.5*screen_height_px)
+
+    mywin = visual.Window(win_size, monitor="testMonitor")
+    # NOTE: the moving around is still error related but i dont know how and why!!
+    
+    # instrcutionScreensPicture(mywin) # here move around with pictures (not as precise as needed)
+    instrcutionScreensSelfDraw(mywin) # here move around with drawing functions 
+    core.wait(0.500)
+    instrcution_2ScreensSelfDraw(mywin)
+
