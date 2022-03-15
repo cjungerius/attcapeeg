@@ -19,8 +19,7 @@ def general_trial(trial, info):
         target_color = info['target_color']
 
         learned_contexts = info['contexts']
-        print(learned_contexts)
-        # this should still work I think for the distractor to be random 
+        
         contextnumber = random.choice([0,1,2])
         distractorlocs = list(filter(lambda x: x!= targetloc, [0, 2, 4, 6]))
         distractorloc = distractorlocs[contextnumber]
@@ -32,7 +31,6 @@ def general_trial(trial, info):
         elif novel: 
             
             learned_contexts_f = list(itertools.chain(*learned_contexts))
-            print('im a novelty')
             
             while True: 
             
