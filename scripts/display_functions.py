@@ -76,15 +76,17 @@ def drawDisplay(my_win, shape_arr, color_arr, display_type, to_draw):
     fixCross.draw() # first draw a fixation cross once more
     
     circle_posns = calculateCirclePosns()
-    stimuli = [shapes[shape] for shape in shape_arr]
+    stimuli = [shapes.get(shape) for shape in shape_arr]
 
     for i, stim in enumerate(stimuli):
-        if color_arr[i] == 'r':
-            stim.setLineColor((1,-1,-1)) #red
-        else:
-            stim.setLineColor((-1,1,-1)) # green
-        stim.pos = circle_posns[i]
-        stim.draw()
+        if stim is not None:            
+            if color_arr[i] == 'r':
+                stim.setLineColor((1,-1,-1)) #red
+            elif color_arr[i] == 'g':
+                stim.setLineColor((-1,1,-1)) # green
+
+            stim.pos = circle_posns[i]
+            stim.draw()
 
         if display_type == 'search': 
             line = visual.Line(win=my_win,units="pix",lineColor=[-1, -1, -1])
@@ -101,11 +103,11 @@ def drawDisplay(my_win, shape_arr, color_arr, display_type, to_draw):
             line.draw()
 
         elif display_type == 'probe letter': 
-            text = visual.TextStim(win=my_win, units='pix', text=to_draw[i], pos=circle_posns[i])
+            text = visual.TextStim(win=my_win, units='pix', text=to_draw[i], height= 36, pos=circle_posns[i])
             text.draw()
 
         else: 
-            text = visual.TextStim(win=my_win, units='pix', text='#', pos=circle_posns[i])
+            text = visual.TextStim(win=my_win, units='pix', text='#', height = 36, pos=circle_posns[i])
             text.draw()
 
     my_win.flip()
@@ -120,8 +122,9 @@ if __name__ == "__main__":
     # exucute the functions press space to continue
     drawFixationDisplay(mywin)
     event.waitKeys(keyList=['space'])
-    # also testable: 
-    # drawDisplay(mywin, shape_arr, color_arr, 'probe letter', letters_arr)
-    # drawDisplay(mywin, shape_arr, color_arr, 'probe mask', [])
+    drawDisplay(mywin, shape_arr, color_arr, 'probe letter', letter_arr)
+    event.waitKeys(keyList=['space'])
+    drawDisplay(mywin, shape_arr, color_arr, 'probe mask', [])
+    event.waitKeys(keyList=['space'])
     drawDisplay(mywin, shape_arr, color_arr, 'search', line_arr)
     event.waitKeys(keyList=['space'])
