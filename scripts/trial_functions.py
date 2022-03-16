@@ -98,11 +98,11 @@ def general_trial(trial, info):
             # maybe we need to report them back as well
             
             # draw the letters for 100msec
-            drawDisplay(mywin, shape_arr, color_arr, 'probe letter', used_letters)
+            drawDisplay(mywin, shape_arr, color_arr, 'letter', used_letters)
             core.wait(.100) # wait for 100msec 
             
             # draw the mask for 500msec
-            drawDisplay(mywin, shape_arr, color_arr, 'probe mask', [])
+            drawDisplay(mywin, shape_arr, color_arr, 'mask', [])
             core.wait(.500) # wait for 500msec 
             
             
@@ -116,6 +116,23 @@ def general_trial(trial, info):
 
         return response, used_letters 
 
+def mapper_trial(trial):
+
+    targetloc = trial['targetloc']
+
+    shape_arr = ['','','','','','','']*7
+    shape_arr.insert(targetloc,'c')
+    color_arr = ['']*8
+
+
+    for i in range(30):
+        drawDisplay(mywin, shape_arr, color_arr,[],[])
+        core.wait(1/30)
+        drawFixationDisplay(mywin)
+        core.wait(1/30)
+
+
+    return
 
 if __name__ == '__main__':
         
@@ -129,6 +146,7 @@ if __name__ == '__main__':
                 'novel': True 
         }
 
-        r = general_trial(trial, info)
+        #r = general_trial(trial, info)
+        r = mapper_trial(trial)
         # to see if returned response value workes correctly 
         print(r)

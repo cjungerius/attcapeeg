@@ -70,7 +70,6 @@ def drawFixationDisplay(my_win):
     # Calculate the number of degrees that correspond to a single pixel
     fixCross.draw()
     my_win.flip()
-    core.wait(0.500)
 
 def drawDisplay(my_win, shape_arr, color_arr, display_type, to_draw):
     fixCross.draw() # first draw a fixation cross once more
@@ -84,7 +83,8 @@ def drawDisplay(my_win, shape_arr, color_arr, display_type, to_draw):
                 stim.setLineColor((1,-1,-1)) #red
             elif color_arr[i] == 'g':
                 stim.setLineColor((-1,1,-1)) # green
-
+            else:
+                stim.setLineColor((-1,-1,-1))
             stim.pos = circle_posns[i]
             stim.draw()
 
@@ -102,11 +102,11 @@ def drawDisplay(my_win, shape_arr, color_arr, display_type, to_draw):
             line.lineWidth = 3
             line.draw()
 
-        elif display_type == 'probe letter': 
+        elif display_type == 'letter': 
             text = visual.TextStim(win=my_win, units='pix', text=to_draw[i], height= 36, pos=circle_posns[i])
             text.draw()
 
-        else: 
+        elif display_type == 'mask': 
             text = visual.TextStim(win=my_win, units='pix', text='#', height = 36, pos=circle_posns[i])
             text.draw()
 
