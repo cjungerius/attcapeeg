@@ -124,6 +124,10 @@ def mapper_trial(trial):
     shape_arr.insert(targetloc,'c')
     color_arr = ['']*8
 
+    jitter = random.random()
+
+    drawFixationDisplay(mywin)
+    core.wait(2*jitter)
 
     for i in range(30):
         drawDisplay(mywin, shape_arr, color_arr,[],[])
@@ -131,8 +135,17 @@ def mapper_trial(trial):
         drawFixationDisplay(mywin)
         core.wait(1/30)
 
+    core.wait(2*(1-jitter))
 
-    return
+    fixCross.color = 'red'
+    drawFixationDisplay(mywin)
+    rtc = core.Clock()
+    rt = event.waitKeys(keyList=['space'], timeStamped=rtc)
+
+    fixCross.color='black'
+    drawFixationDisplay(mywin)
+
+    return rt
 
 if __name__ == '__main__':
         
@@ -147,6 +160,8 @@ if __name__ == '__main__':
         }
 
         #r = general_trial(trial, info)
-        r = mapper_trial(trial)
-        # to see if returned response value workes correctly 
-        print(r)
+        for i in range(2):
+            r = mapper_trial(trial)
+
+            # to see if returned response value workes correctly 
+            print(r)
