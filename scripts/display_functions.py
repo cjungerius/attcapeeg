@@ -122,9 +122,9 @@ if __name__ == "__main__":
     # exucute the functions press space to continue
     drawFixationDisplay(mywin)
     event.waitKeys(keyList=['space'])
-    drawDisplay(mywin, shape_arr, color_arr, 'probe letter', letter_arr)
+    drawDisplay(mywin, shape_arr, color_arr, 'letter', letter_arr)
     event.waitKeys(keyList=['space'])
-    drawDisplay(mywin, shape_arr, color_arr, 'probe mask', [])
+    drawDisplay(mywin, shape_arr, color_arr, 'mask', [])
     event.waitKeys(keyList=['space'])
     drawDisplay(mywin, shape_arr, color_arr, 'search', line_arr)
     event.waitKeys(keyList=['space'])
