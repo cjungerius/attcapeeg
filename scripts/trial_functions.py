@@ -7,43 +7,36 @@ import itertools
 
 
 
-def general_trial(trial, info):
+def general_trial(trial, info, blockType):
         targetloc = trial['targetloc']
         distractor = trial['distractor']
         lineDir = trial['lineDir']
         
         trialType = trial['trialType']
-        novel = trial['novel']
 
         target_shape = info['target_shape']
         target_color = info['target_color']
 
-        learned_contexts = info['contexts']
-        
-        contextnumber = random.choice([0,1,2])
-        distractorlocs = list(filter(lambda x: x!= targetloc, [0, 2, 4, 6]))
-        distractorloc = distractorlocs[contextnumber]
+        if blockType == 'search 8':
+            targetLocs = [0,1,2,3,4,5,6,7]
+            number = random.choice([0,1,2,3,4,5,6])
+            distractorlocs = list(filter(lambda x: x!= targetloc, targetLocs))
+            distractorloc = distractorlocs[number]
+        elif blockType == 'search 8/4': 
+            targetLocs = [0,2,4,6]
+            number = random.choice([0,1,2])
+            distractorlocs = list(filter(lambda x: x!= targetloc, targetLocs))
+            distractorloc = distractorlocs[number]
 
-        if not novel: # means that contexts are learned 
-            shape_arr = copy.deepcopy(learned_contexts[targetloc//2][contextnumber])
+        if target_shape == 'c': 
+            shape_arr = ['s', 's', 's', 'h', 'h', 'h', 'd']
+        else: 
+            shape_arr = ['s', 's', 's', 'h', 'h', 'h', 'c']
+        random.shuffle(shape_arr) 
 
-
-        elif novel: 
-            
-            learned_contexts_f = list(itertools.chain(*learned_contexts))
-            
-            while True: 
-            
-                if target_shape == 'c': 
-                    shape_arr = ['s', 's', 's', 'h', 'h', 'h', 'd']
-                else: 
-                    shape_arr = ['s', 's', 's', 'h', 'h', 'h', 'c']
-                random.shuffle(shape_arr) 
-                
-                if shape_arr not in learned_contexts_f:                
-                    break
 
         shape_arr.insert(targetloc,target_shape)
+        
         color_arr = [target_color] * 8
         if distractor:
                 color_arr[distractorloc] = next(filter(lambda c: c!=target_color,['r','g']))
@@ -52,10 +45,6 @@ def general_trial(trial, info):
 
         core.wait(.500)
 
-        #print(len(shape_arr), len(color_arr))
-        #drawSearchDisplay(mywin, shape_arr, color_arr)
-        #event.waitKeys(maxWait = 2.0, keyList=['left','right'])
-        
         if trialType == 'search': 
             line_arr = ['', '', '', '', '', '', '', '']
             line_arr[targetloc] = lineDir
@@ -95,7 +84,6 @@ def general_trial(trial, info):
             random.shuffle(letter_arr) # shuffle them 
             
             used_letters = letter_arr[0:8] # only first 8 letters used
-            # maybe we need to report them back as well
             
             # draw the letters for 100msec
             drawDisplay(mywin, shape_arr, color_arr, 'probe letter', used_letters)
@@ -112,7 +100,6 @@ def general_trial(trial, info):
             
             # wait for answer
             response = letterListener(mywin)
-            # do we want a ratio here? 
 
         return response, used_letters 
 
@@ -126,7 +113,6 @@ if __name__ == '__main__':
                 'distractor': True,
                 'trialType': 'search',
                 'lineDir': 'l',
-                'novel': True 
         }
 
         r = general_trial(trial, info)
